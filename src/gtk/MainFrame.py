@@ -49,7 +49,7 @@ class MainFrame(wx.Frame):
         self.__set_properties()
         self.__do_layout()
 
-        self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.package_selected, self.PackageList)
+        self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.PackageSelected, self.PackageList)
         # end wxGlade
 
     def __set_properties(self):
@@ -84,10 +84,10 @@ class MainFrame(wx.Frame):
         self.Layout()
         # end wxGlade
 
-    def package_selected(self, event): # wxGlade: MainFrame.<event_handler>
+    def PackageSelected(self, event): # wxGlade: MainFrame.<event_handler>
+        self.PackageList.currentItem = event.m_itemIndex
         self.InfoTextView.set_pkg_info(self.PackageList.packages[event.m_itemIndex])
-        self.PackageList.on_click(event)
-        
+
 # end of class MainFrame
 
 
