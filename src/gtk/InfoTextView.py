@@ -30,7 +30,7 @@ class InfoTextView(wx.TextCtrl):
 	def __init__(self, parent, id, text, style):
 		wx.TextCtrl.__init__(self, parent, id, text, style=style)
 		
-	def set_pkg_info(self,package):
+	def SetPkgInfo(self,package):
 		self.Remove(0,-1)
 		self.WriteText(" "+package.getName()+" ("+package.getVersion()+")")
 		f = self.GetFont()

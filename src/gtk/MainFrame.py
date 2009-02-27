@@ -7,12 +7,25 @@ import wx
 # end wxGlade
 
 # begin wxGlade: extracode
+import sys
+sys.path.append("../")
+import manager
 from PackageList import PackageList
 from InfoTextView import InfoTextView
+from RepoList import RepoList
 # end wxGlade
 
 class MainFrame(wx.Frame):
     def __init__(self, *args, **kwds):
+        self.queue = []
+        self.filter = [0,""]
+        package1 = manager.Package("3ddesktop","extra","0.2.9-2","a 3d virtual desktop switcher (opengl/mesa)","66 KiB")
+        package2 = manager.Package("6tunnel","community","0.11rc2-3","Tunnels IPv6 connections for IPv4-only applications","114 KiB")
+        package3 = manager.Package("9base","community","2-3","Port of various original Plan9 tools to unix","5.69 MiB")
+        package4 = manager.Package("a2ps","extra","4.13c1","a2ps is an Any to PostScript filter","690 KiB")
+        package5 = manager.Package("a52dec","extra","0.7.4-4","liba52 is a free library for decoding ATSC A/52 streams.","60 KiB")
+        package6 = manager.Package("libcompizconfig","community","0.7.8-2","Compiz configuration system library","114 KiB")
+        self.packages = [package1,package2,package3,package4,package5,package6]
         # begin wxGlade: MainFrame.__init__
         kwds["style"] = wx.DEFAULT_FRAME_STYLE
         wx.Frame.__init__(self, *args, **kwds)
@@ -37,7 +50,7 @@ class MainFrame(wx.Frame):
         self.MainWindow_toolbar.AddSeparator()
         self.MainWindow_toolbar.AddLabelTool(wx.NewId(), "Search", wx.NullBitmap, wx.NullBitmap, wx.ITEM_NORMAL, "", "")
         # Tool Bar end
-        self.RepoList = wx.ListBox(self.PackageGroupTabs, -1, choices=[])
+        self.RepoList = RepoList(self.PackageGroupTabs, 4, style=wx.LC_LIST|wx.LC_REPORT|wx.LC_NO_HEADER|wx.NO_BORDER)
         self.GroupList = wx.ListBox(self.PackageGroupTabs, -1, choices=[])
         self.StatusList = wx.ListBox(self.PackageGroupTabs, -1, choices=[])
         self.PackageList = PackageList(self.VerticleSpitter, -1, style=wx.LC_REPORT|wx.LC_VIRTUAL|wx.LC_SORT_ASCENDING|wx.SUNKEN_BORDER)
@@ -46,9 +59,13 @@ class MainFrame(wx.Frame):
         self.FileTreeView = wx.TreeCtrl(self.InfoTabs, -1, style=wx.TR_HAS_BUTTONS|wx.TR_NO_LINES|wx.TR_DEFAULT_STYLE|wx.SUNKEN_BORDER)
         self.DependListView = wx.ListBox(self.InfoTabs, -1, choices=[])
 
+        self.RepoList.SetRepositories(["all","core","community","extra","aur"])
+        self.PackageList.SetPackages(self.packages)
+
         self.__set_properties()
         self.__do_layout()
 
+        self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.ResetFilters, self.RepoList)
         self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.PackageSelected, self.PackageList)
         # end wxGlade
 
@@ -86,7 +103,11 @@ class MainFrame(wx.Frame):
 
     def PackageSelected(self, event): # wxGlade: MainFrame.<event_handler>
         self.PackageList.currentItem = event.m_itemIndex
-        self.InfoTextView.set_pkg_info(self.PackageList.packages[event.m_itemIndex])
+        self.InfoTextView.SetPkgInfo(self.PackageList.packages[event.m_itemIndex])
+        
+    def ResetFilters(self, event): # wxGlade: MainFrame.<event_handler>
+        self.PackageList.SetFilter([event.GetId(),event.GetText()])
+        
 
 # end of class MainFrame
 

@@ -23,27 +23,21 @@ import wx
 import sys
 sys.path.append("../")
 import manager
+import  wx.lib.mixins.listctrl  as  listmix
 
-class PackageList(wx.ListCtrl):
+class PackageList(wx.ListCtrl,listmix.ListCtrlAutoWidthMixin):
 
 	def __init__(self, parent, id, style):
 		wx.ListCtrl.__init__(self, parent, id, style=style)
+		listmix.ListCtrlAutoWidthMixin.__init__(self)
 		self.InsertColumn(0, "", width=20)
-		self.InsertColumn(1, "Package Name", width=210)
+		self.InsertColumn(1, "Package Name", width=200)
 		self.InsertColumn(2, "Version", width=wx.LIST_AUTOSIZE)
 		self.InsertColumn(3, "Size", width=wx.LIST_AUTOSIZE)
 		self.InsertColumn(4, "Repository", width=wx.LIST_AUTOSIZE)
 		self.InsertColumn(5, "Groups", width=wx.LIST_AUTOSIZE)
 		self.Bind(wx.EVT_LEFT_DCLICK, self.OnDblClick)
 		self.Bind(wx.EVT_LIST_COL_CLICK, self.OnColClick)
-		self.queue = []
-		package1 = manager.Package("3ddesktop","extra","0.2.9-2","a 3d virtual desktop switcher (opengl/mesa)","66 KiB")
-		package2 = manager.Package("6tunnel","community","0.11rc2-3","Tunnels IPv6 connections for IPv4-only applications","114 KiB")
-		package3 = manager.Package("9base","community","2-3","Port of various original Plan9 tools to unix","5.69 MiB")
-		package4 = manager.Package("a2ps","extra","4.13c1","a2ps is an Any to PostScript filter","690 KiB")
-		package5 = manager.Package("a52dec","extra","0.7.4-4","liba52 is a free library for decoding ATSC A/52 streams.","60 KiB")
-		package6 = manager.Package("libcompizconfig","community","0.7.8-2","Compiz configuration system library","114 KiB")
-		self.SetPackages([package1,package2,package3,package4,package5,package6])
 		
 	def OnGetItemText(self, item, col):
 		package = self.packages[item]
@@ -67,6 +61,7 @@ class PackageList(wx.ListCtrl):
 	def SetPackages(self, packages):
 		self.SetItemCount(len(packages))
 		self.packages = packages
+		self.filteredPackages = []
 		self.sortedColumn = [1,1]
 		self.packages.sort(key=manager.Package.getName)
 
@@ -77,8 +72,7 @@ class PackageList(wx.ListCtrl):
 		#else:
 		#	self.SetStringItem(self.currentItem,0,"O")
 
-	def OnColClick(self,event):
-		col = event.GetColumn()
+	def SortColumn(self,col):
 		if (col==0):
 			self.packages.sort(key=manager.Package.isInstalled)
 		elif (col==1):
@@ -96,3 +90,21 @@ class PackageList(wx.ListCtrl):
 			self.packages.reverse()
 			i = 0
 		self.sortedColumn = [col,i]
+		
+	def OnColClick(self,event):
+		col = event.GetColumn()
+		self.SortColumn(col)
+
+	def SetFilter(self, filter):
+		for package in self.filteredPackages:
+			self.packages.append(package)
+		self.filteredPackages = []
+		if filter[1]!="all":
+			for package in self.packages:
+				if filter[0]==4 and package.getRepository()!=filter[1]:
+					self.filteredPackages.append(package)
+		for package in self.filteredPackages:
+			self.packages.remove(package)
+		self.SetItemCount(len(self.packages))
+		self.sortedColumn[1] = abs(self.sortedColumn[1]-1)
+		self.SortColumn(self.sortedColumn[0])
