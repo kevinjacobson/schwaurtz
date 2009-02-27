@@ -12,7 +12,7 @@ sys.path.append("../")
 import manager
 from PackageList import PackageList
 from InfoTextView import InfoTextView
-from RepoList import RepoList
+from FilterList import FilterList
 # end wxGlade
 
 class MainFrame(wx.Frame):
@@ -50,26 +50,29 @@ class MainFrame(wx.Frame):
         self.MainWindow_toolbar.AddSeparator()
         self.MainWindow_toolbar.AddLabelTool(wx.NewId(), "Search", wx.NullBitmap, wx.NullBitmap, wx.ITEM_NORMAL, "", "")
         # Tool Bar end
-        self.RepoList = RepoList(self.PackageGroupTabs, 4, style=wx.LC_LIST|wx.LC_REPORT|wx.LC_NO_HEADER|wx.NO_BORDER)
-        self.GroupList = wx.ListBox(self.PackageGroupTabs, -1, choices=[])
-        self.StatusList = wx.ListBox(self.PackageGroupTabs, -1, choices=[])
+        self.RepoList = FilterList(self.PackageGroupTabs, 4, style=wx.LC_LIST|wx.LC_REPORT|wx.LC_NO_HEADER|wx.NO_BORDER)
+        self.GroupList = FilterList(self.PackageGroupTabs, 5, style=wx.LC_LIST|wx.LC_REPORT|wx.LC_NO_HEADER|wx.NO_BORDER)
+        self.StatusList = FilterList(self.PackageGroupTabs, 0, style=wx.LC_LIST|wx.LC_REPORT|wx.LC_NO_HEADER|wx.NO_BORDER)
         self.PackageList = PackageList(self.VerticleSpitter, -1, style=wx.LC_REPORT|wx.LC_VIRTUAL|wx.LC_SORT_ASCENDING|wx.SUNKEN_BORDER)
         self.InfoTextView = InfoTextView(self.InfoTabs, -1, "", style=wx.TE_MULTILINE|wx.TE_READONLY|wx.TE_RICH2|wx.TE_LINEWRAP)
         self.FeedbackTextView = wx.TextCtrl(self.InfoTabs, -1, "", style=wx.TE_MULTILINE|wx.TE_READONLY|wx.TE_LINEWRAP)
         self.FileTreeView = wx.TreeCtrl(self.InfoTabs, -1, style=wx.TR_HAS_BUTTONS|wx.TR_NO_LINES|wx.TR_DEFAULT_STYLE|wx.SUNKEN_BORDER)
         self.DependListView = wx.ListBox(self.InfoTabs, -1, choices=[])
 
-        self.RepoList.SetRepositories(["all","core","community","extra","aur"])
-        self.PackageList.SetPackages(self.packages)
-
         self.__set_properties()
         self.__do_layout()
 
-        self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.ResetFilters, self.RepoList)
+        self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.ResetFilters, id=4)
+        self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.ResetFilters, id=5)
+        self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.ResetFilters, id=0)
         self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.PackageSelected, self.PackageList)
         # end wxGlade
 
     def __set_properties(self):
+        self.RepoList.PopulateList(["all","core","community","extra","aur"])
+        self.GroupList.PopulateList(["compiz","group1","group2"])
+        self.StatusList.PopulateList(["Installed","Not Installed","Upgragable","In Queue"])
+        self.PackageList.SetPackages(self.packages)
         # begin wxGlade: MainFrame.__set_properties
         self.SetTitle("The Shwaurtz Package Manager")
         self.MainWindow_toolbar.SetToolBitmapSize((16, 15))

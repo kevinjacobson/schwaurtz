@@ -25,14 +25,14 @@ sys.path.append("../")
 import manager
 import  wx.lib.mixins.listctrl  as  listmix
 
-class RepoList(wx.ListCtrl,listmix.ListCtrlAutoWidthMixin):
+class FilterList(wx.ListCtrl,listmix.ListCtrlAutoWidthMixin):
 
 	def __init__(self, parent, id, style):
 		wx.ListCtrl.__init__(self, parent, id, style=style)
 		listmix.ListCtrlAutoWidthMixin.__init__(self)
-		self.InsertColumn(0, "Repo")
+		self.InsertColumn(0, "")
 
-	def SetRepositories(self, repos):
-		for repo in repos:
-			self.InsertStringItem(sys.maxint,repo,0)
+	def PopulateList(self, items):
+		for item in items:
+			self.InsertStringItem(sys.maxint,item,0)
 
