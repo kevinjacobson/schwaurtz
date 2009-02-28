@@ -60,13 +60,11 @@ class PackageList(wx.ListCtrl,listmix.ListCtrlAutoWidthMixin):
         elif col == 2:
             return package.getVersion()
         elif col == 3:
-            return "%d KiB" % (item*100)
-            #return package.__size
+            return package.getSize()
         elif col == 4:
             return package.getRepo()
         elif col == 5:
-            return ""
-            #return package.__groups
+            return package.getGroups()
 
     def SetPackages(self, packages):
         self.SetItemCount(len(packages))
@@ -90,11 +88,11 @@ class PackageList(wx.ListCtrl,listmix.ListCtrlAutoWidthMixin):
         elif (col==2):
             self.packages.sort(key=manager.Package.getVersion)
         elif (col==3):
-            self.packages.sort(key=manager.Package.getName)
+            self.packages.sort(key=manager.Package.getSize)
         elif (col==4):
             self.packages.sort(key=manager.Package.getRepository)
         elif (col==5):
-            self.packages.sort(key=manager.Package.getName)
+            self.packages.sort(key=manager.Package.getGroups)
         i = 1
         if (col==self.sortedColumn[0] and self.sortedColumn[1]):
             self.packages.reverse()
@@ -113,6 +111,15 @@ class PackageList(wx.ListCtrl,listmix.ListCtrlAutoWidthMixin):
             for package in self.packages:
                 if filter[0]==4 and package.getRepository()!=filter[1]:
                     self.filteredPackages.append(package)
+                elif filter[0]==5 and (package.getGroups()==None or not (filter[1] in package.getGroups())):
+                    self.filteredPackages.append(package)
+                elif filter[0]==0:
+                    if filter[1]=="Installed" and not package.isInstalled():
+                        self.filteredPackages.append(package)
+                    elif filter[1]=="Upgradable" and package.isUpToDate():
+                        self.filteredPackages.append(package)
+                    elif filter[1]=="Not Installed" and package.isInstalled():
+                        self.filteredPackages.append(package)
         for package in self.filteredPackages:
             self.packages.remove(package)
         self.SetItemCount(len(self.packages))

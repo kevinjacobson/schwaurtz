@@ -98,7 +98,7 @@ class MainFrame(wx.Frame):
     def __set_properties(self):
         self.RepoList.PopulateList(["all","core","community","extra","aur"])
         self.GroupList.PopulateList(["compiz","group1","group2"])
-        self.StatusList.PopulateList(["Installed","Not Installed","Upgragable","In Queue"])
+        self.StatusList.PopulateList(["Installed","Not Installed","Upgradable","In Queue"])
         self.PackageList.SetPackages(self.packages)
         # begin wxGlade: MainFrame.__set_properties
         self.SetTitle("The Shwaurtz Package Manager")
