@@ -51,27 +51,33 @@ class PackageList(wx.ListCtrl,listmix.ListCtrlAutoWidthMixin):
         
     def OnGetItemText(self, item, col):
         package = self.packages[item]
-        if col == 0 and package.isInstalled():
+        if col == 0 and package.has_key('Update'):
+            return "U"
+        elif col == 0 and package.has_key('Install Reason'):
             return "X"
-        elif col == 0 and not package.isInstalled():
+        elif col == 0 and not package.has_key('Install Reason'):
             return "O"
-        elif col == 1:
-            return package.getName()
-        elif col == 2:
-            return package.getVersion()
-        elif col == 3:
-            return package.getSize()
-        elif col == 4:
-            return package.getRepo()
-        elif col == 5:
-            return package.getGroups()
+        elif col == 1 and package.has_key('Name'):
+            return package['Name']
+        elif col == 2 and package.has_key('Version'):
+            return package['Version']
+        elif col == 3 and package.has_key('Installed Size'):
+            return package['Installed Size']
+        elif col == 4 and package.has_key('Repository'):
+            return package['Repository']
+        elif col == 4 and not package.has_key('Repository'):
+            return "local"
+        elif col == 5 and package.has_key('Groups'):
+            return package['Groups']
 
     def SetPackages(self, packages):
         self.SetItemCount(len(packages))
         self.packages = packages
         self.filteredPackages = []
         self.sortedColumn = [1,1]
-        self.packages.sort(key=manager.Package.getName)
+        data = [ (x['Name'], x) for x in self.packages ] # decorate
+        data.sort()
+        self.packages = [ x[1] for x in data ] # undecorate
 
     def OnDblClick(self, event):
         print "double click"
@@ -82,17 +88,33 @@ class PackageList(wx.ListCtrl,listmix.ListCtrlAutoWidthMixin):
 
     def SortColumn(self,col):
         if (col==0):
-            self.packages.sort(key=manager.Package.isInstalled)
+            print "not implemented"
+            #self.packages.sort(key=manager.Package.isInstalled)
         elif (col==1):
-            self.packages.sort(key=manager.Package.getName)
+            data = [ (x['Name'], x) for x in self.packages ] # decorate
+            data.sort()
+            self.packages = [ x[1] for x in data ] # undecorate
+            #self.packages.sort(key=manager.Package.getName)
         elif (col==2):
-            self.packages.sort(key=manager.Package.getVersion)
+            data = [ (x['Version'], x) for x in self.packages ] # decorate
+            data.sort()
+            self.packages = [ x[1] for x in data ] # undecorate
+            #self.packages.sort(key=manager.Package.getVersion)
         elif (col==3):
-            self.packages.sort(key=manager.Package.getSize)
+            data = [ (x['Installed Size'], x) for x in self.packages ] # decorate
+            data.sort()
+            self.packages = [ x[1] for x in data ] # undecorate    
+            #self.packages.sort(key=manager.Package.getSize)
         elif (col==4):
-            self.packages.sort(key=manager.Package.getRepository)
+            data = [ (x['Repository'], x) for x in self.packages ] # decorate
+            data.sort()
+            self.packages = [ x[1] for x in data ] # undecorate
+            #self.packages.sort(key=manager.Package.getRepository)
         elif (col==5):
-            self.packages.sort(key=manager.Package.getGroups)
+            data = [ (x['Groups'], x) for x in self.packages ] # decorate
+            data.sort()
+            self.packages = [ x[1] for x in data ] # undecorate
+            #self.packages.sort(key=manager.Package.getGroups)
         i = 1
         if (col==self.sortedColumn[0] and self.sortedColumn[1]):
             self.packages.reverse()
@@ -103,25 +125,25 @@ class PackageList(wx.ListCtrl,listmix.ListCtrlAutoWidthMixin):
         col = event.GetColumn()
         self.SortColumn(col)
 
-    def SetFilter(self, filter):
-        for package in self.filteredPackages:
-            self.packages.append(package)
-        self.filteredPackages = []
-        if filter[1]!="all":
-            for package in self.packages:
-                if filter[0]==4 and package.getRepository()!=filter[1]:
-                    self.filteredPackages.append(package)
-                elif filter[0]==5 and (package.getGroups()==None or not (filter[1] in package.getGroups())):
-                    self.filteredPackages.append(package)
-                elif filter[0]==0:
-                    if filter[1]=="Installed" and not package.isInstalled():
-                        self.filteredPackages.append(package)
-                    elif filter[1]=="Upgradable" and package.isUpToDate():
-                        self.filteredPackages.append(package)
-                    elif filter[1]=="Not Installed" and package.isInstalled():
-                        self.filteredPackages.append(package)
-        for package in self.filteredPackages:
-            self.packages.remove(package)
-        self.SetItemCount(len(self.packages))
-        self.sortedColumn[1] = abs(self.sortedColumn[1]-1)
-        self.SortColumn(self.sortedColumn[0])
+    #def SetFilter(self, filter):
+        #for package in self.filteredPackages:
+            #self.packages.append(package)
+        #self.filteredPackages = []
+        #if filter[1]!="all":
+            #for package in self.packages:
+                #if filter[0]==4 and package.getRepository()!=filter[1]:
+                    #self.filteredPackages.append(package)
+                #elif filter[0]==5 and (package.getGroups()==None or not (filter[1] in package.getGroups())):
+                    #self.filteredPackages.append(package)
+                #elif filter[0]==0:
+                    #if filter[1]=="Installed" and not package.isInstalled():
+                        #self.filteredPackages.append(package)
+                    #elif filter[1]=="Upgradable" and package.isUpToDate():
+                        #self.filteredPackages.append(package)
+                    #elif filter[1]=="Not Installed" and package.isInstalled():
+                        #self.filteredPackages.append(package)
+        #for package in self.filteredPackages:
+            #self.packages.remove(package)
+        #self.SetItemCount(len(self.packages))
+        #self.sortedColumn[1] = abs(self.sortedColumn[1]-1)
+        #self.SortColumn(self.sortedColumn[0])

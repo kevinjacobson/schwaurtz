@@ -36,7 +36,7 @@ import wx
 # begin wxGlade: extracode
 import sys
 sys.path.append("../")
-import manager
+from manager import PacmanData
 from PackageList import PackageList
 from InfoTextView import InfoTextView
 from FilterList import FilterList
@@ -46,13 +46,13 @@ class MainFrame(wx.Frame):
     def __init__(self, *args, **kwds):
         self.queue = []
         self.filter = [0,""]
-        package1 = manager.Package("3ddesktop","extra","0.2.9-2","a 3d virtual desktop switcher (opengl/mesa)","66 KiB")
-        package2 = manager.Package("6tunnel","community","0.11rc2-3","Tunnels IPv6 connections for IPv4-only applications","114 KiB")
-        package3 = manager.Package("9base","community","2-3","Port of various original Plan9 tools to unix","5.69 MiB")
-        package4 = manager.Package("a2ps","extra","4.13c1","a2ps is an Any to PostScript filter","690 KiB")
-        package5 = manager.Package("a52dec","extra","0.7.4-4","liba52 is a free library for decoding ATSC A/52 streams.","60 KiB")
-        package6 = manager.Package("libcompizconfig","community","0.7.8-2","Compiz configuration system library","114 KiB")
-        self.packages = [package1,package2,package3,package4,package5,package6]
+        #package1 = manager.Package("3ddesktop","extra","0.2.9-2","a 3d virtual desktop switcher (opengl/mesa)","66 KiB")
+        #package2 = manager.Package("6tunnel","community","0.11rc2-3","Tunnels IPv6 connections for IPv4-only applications","114 KiB")
+        #package3 = manager.Package("9base","community","2-3","Port of various original Plan9 tools to unix","5.69 MiB")
+        #package4 = manager.Package("a2ps","extra","4.13c1","a2ps is an Any to PostScript filter","690 KiB")
+        #package5 = manager.Package("a52dec","extra","0.7.4-4","liba52 is a free library for decoding ATSC A/52 streams.","60 KiB")
+        #package6 = manager.Package("libcompizconfig","community","0.7.8-2","Compiz configuration system library","114 KiB")
+        self.packages = PacmanData.getPackageList()
         # begin wxGlade: MainFrame.__init__
         kwds["style"] = wx.DEFAULT_FRAME_STYLE
         wx.Frame.__init__(self, *args, **kwds)
@@ -101,7 +101,7 @@ class MainFrame(wx.Frame):
         self.StatusList.PopulateList(["Installed","Not Installed","Upgradable","In Queue"])
         self.PackageList.SetPackages(self.packages)
         # begin wxGlade: MainFrame.__set_properties
-        self.SetTitle("The Shwaurtz Package Manager")
+        self.SetTitle("The Schwaurtz Package Manager")
         self.MainWindow_toolbar.SetToolBitmapSize((16, 15))
         self.MainWindow_toolbar.SetMargins((0, 0))
         self.MainWindow_toolbar.SetToolPacking(1)
