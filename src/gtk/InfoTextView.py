@@ -30,7 +30,7 @@
 import wx
 import sys
 sys.path.append("../")
-import manager
+from manager import PacmanData
 
 class InfoTextView(wx.TextCtrl):
 
@@ -39,19 +39,26 @@ class InfoTextView(wx.TextCtrl):
         
     def SetPkgInfo(self,package):
         self.Remove(0,-1)
-        self.WriteText(" "+package.getName()+" ("+package.getVersion()+")")
+        self.WriteText(" "+package['Name']+" ("+package['Version']+")")
         f = self.GetFont()
         f.SetWeight(wx.BOLD)
         self.SetStyle(0, -1, wx.TextAttr(wx.NullColour, wx.NullColour, f))
         self.WriteText("\n\n ")
-        self.WriteText(package.getDesc())
+        if package.has_key('Description'):
+            self.WriteText(package['Description'])
+        else:
+            self.WriteText("no description")
         self.WriteText("\n\n ")
         start = len(self.GetValue())
-        if package.isInstalled():
-            self.WriteText("Status: Installed\n ",wx.BOLD)
+        if package.has_key('Install Reason'):
+            self.WriteText("Status: Installed\n ")
         else:
             self.WriteText("Status: Not installed\n ")
         self.SetStyle(start, start+7, wx.TextAttr(wx.NullColour, wx.NullColour, f))
         start = len(self.GetValue())
-        self.WriteText("Version in the Repository:")
-        self.SetStyle(start, start+26, wx.TextAttr(wx.NullColour, wx.NullColour, f))
+        self.WriteText("Version in the Repository: ")
+        self.SetStyle(start, -1, wx.TextAttr(wx.NullColour, wx.NullColour, f))
+        if package.has_key('Update'):
+            self.WriteText(package['Update']['Version'])
+        else:
+            self.WriteText(package['Version'])

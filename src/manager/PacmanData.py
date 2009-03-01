@@ -36,10 +36,12 @@ def getInstalledPackageList():
     output = {}
     package = {}
     for line in p.readlines():
-        keyAndObject = line.split(":")
+        keyAndObject = line.split(" : ")
         if len(keyAndObject)==2:
             package[keyAndObject[0].strip()] = keyAndObject[1].strip()
         elif package.has_key('Name'):
+            if not package.has_key('Repository'):
+                package['Repository'] = "local"
             output[package['Name']]=package
             package = {}
         
@@ -50,7 +52,7 @@ def addRemotePackages(packageList):
     output = packageList
     package = {}
     for line in p.readlines():
-        keyAndObject = line.split(":")
+        keyAndObject = line.split(" : ")
         if len(keyAndObject)==2:
             package[keyAndObject[0].strip()] = keyAndObject[1].strip()
         elif package.has_key('Name') and output.has_key(package['Name']):
@@ -68,3 +70,10 @@ def getPackageList():
     for k in dict.keys():
         list.append(dict[k])
     return list
+
+def getValueSet(packageList,key):
+    set = []
+    for p in packageList:
+        if not p[key] in set:
+            set.append(p[key])
+    return set

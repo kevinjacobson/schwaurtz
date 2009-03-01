@@ -46,12 +46,6 @@ class MainFrame(wx.Frame):
     def __init__(self, *args, **kwds):
         self.queue = []
         self.filter = [0,""]
-        #package1 = manager.Package("3ddesktop","extra","0.2.9-2","a 3d virtual desktop switcher (opengl/mesa)","66 KiB")
-        #package2 = manager.Package("6tunnel","community","0.11rc2-3","Tunnels IPv6 connections for IPv4-only applications","114 KiB")
-        #package3 = manager.Package("9base","community","2-3","Port of various original Plan9 tools to unix","5.69 MiB")
-        #package4 = manager.Package("a2ps","extra","4.13c1","a2ps is an Any to PostScript filter","690 KiB")
-        #package5 = manager.Package("a52dec","extra","0.7.4-4","liba52 is a free library for decoding ATSC A/52 streams.","60 KiB")
-        #package6 = manager.Package("libcompizconfig","community","0.7.8-2","Compiz configuration system library","114 KiB")
         self.packages = PacmanData.getPackageList()
         # begin wxGlade: MainFrame.__init__
         kwds["style"] = wx.DEFAULT_FRAME_STYLE
@@ -72,6 +66,8 @@ class MainFrame(wx.Frame):
         self.MainWindow_toolbar.AddLabelTool(wx.NewId(), "Reload", wx.NullBitmap, wx.NullBitmap, wx.ITEM_NORMAL, "", "")
         self.MainWindow_toolbar.AddLabelTool(wx.NewId(), "Mark All Upgrades", wx.NullBitmap, wx.NullBitmap, wx.ITEM_NORMAL, "", "")
         self.MainWindow_toolbar.AddLabelTool(wx.NewId(), "Apply", wx.NullBitmap, wx.NullBitmap, wx.ITEM_NORMAL, "", "")
+        self.MainWindow_toolbar.AddSeparator()
+        self.MainWindow_toolbar.AddLabelTool(wx.NewId(), "AUR", wx.NullBitmap, wx.NullBitmap, wx.ITEM_CHECK, "", "")
         self.MainWindow_toolbar.AddSeparator()
         self.MainWindow_toolbar.AddLabelTool(wx.NewId(), "Properties", wx.NullBitmap, wx.NullBitmap, wx.ITEM_NORMAL, "", "")
         self.MainWindow_toolbar.AddSeparator()
@@ -96,8 +92,10 @@ class MainFrame(wx.Frame):
         # end wxGlade
 
     def __set_properties(self):
-        self.RepoList.PopulateList(["all","core","community","extra","aur"])
-        self.GroupList.PopulateList(["compiz","group1","group2"])
+        repos= PacmanData.getValueSet(self.packages,"Repository")
+        repos.insert(0,"all")
+        self.RepoList.PopulateList(repos)
+        self.GroupList.PopulateList(PacmanData.getValueSet(self.packages,"Groups"))
         self.StatusList.PopulateList(["Installed","Not Installed","Upgradable","In Queue"])
         self.PackageList.SetPackages(self.packages)
         # begin wxGlade: MainFrame.__set_properties
