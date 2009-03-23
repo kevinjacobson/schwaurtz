@@ -31,45 +31,50 @@
 
 import subprocess as sub
 
-def getInstalledPackageList():
+def checkPackageStatus():
     p = sub.Popen(["pacman","-Qi"],stdout=sub.PIPE).stdout
-    output = {}
+    output = []
     package = {}
     for line in p.readlines():
         keyAndObject = line.split(" : ")
         if len(keyAndObject)==2:
             package[keyAndObject[0].strip()] = keyAndObject[1].strip()
-        elif package.has_key('Name'):
+        elif line.strip()=="" and package.has_key('Name'):
             if not package.has_key('Repository'):
                 package['Repository'] = "local"
-            output[package['Name']]=package
+                package['Install Reason'] = "Unknown"
+            output.append(package)
             package = {}
-        
+
     return output
 
-def addRemotePackages(packageList):
+def addRemotePackages():
     p = sub.Popen(["pacman","--sync","--info"],stdout=sub.PIPE).stdout
-    output = packageList
+    output = []
     package = {}
+    currentKey = None
     for line in p.readlines():
         keyAndObject = line.split(" : ")
         if len(keyAndObject)==2:
-            package[keyAndObject[0].strip()] = keyAndObject[1].strip()
-        elif package.has_key('Name') and output.has_key(package['Name']):
-            output[package['Name']]['Repository']=package['Repository']
-            if output[package['Name']]['Version']!=package['Version']:
-                output[package['Name']]['Update']=package
-        elif package.has_key('Name'):
-            output[package['Name']]=package
+            currentKey = keyAndObject[0].strip()
+            package[currentKey] = keyAndObject[1].strip()
+        elif line.strip()=="" and package.has_key('Name'):
+            output.append(package)
             package = {}
+        else:
+            package[currentKey] += " "+keyAndObject[0].strip()
     return output
     
 def getPackageList():
-    dict = addRemotePackages(getInstalledPackageList())
-    list = []
-    for k in dict.keys():
-        list.append(dict[k])
-    return list
+    #dict = addRemotePackages(getInstalledPackageList())
+    #list = []
+    #for k in dict.keys():
+    #    list.append(dict[k])
+    packages = addRemotePackages()
+    data = [ (x['Name'], x) for x in packages ] # decorate
+    data.sort()
+    packages = [ x[1] for x in data ] # undecorate
+    return packages
 
 def getValueSet(packageList,key):
     set = []

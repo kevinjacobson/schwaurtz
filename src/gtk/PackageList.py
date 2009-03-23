@@ -32,7 +32,6 @@
 import wx
 import sys
 sys.path.append("../")
-import manager
 import  wx.lib.mixins.listctrl  as  listmix
 
 class PackageList(wx.ListCtrl,listmix.ListCtrlAutoWidthMixin):
@@ -133,7 +132,7 @@ class PackageList(wx.ListCtrl,listmix.ListCtrlAutoWidthMixin):
                 elif filter[0]==5 and (package['Groups']==None or not (filter[1] in package['Groups'])):
                     self.filteredPackages.append(package)
                 elif filter[0]==0:
-                    if filter[1]=="Installed" and not (package.has_key('Install Reason') or package['Repository']=='local'):
+                    if filter[1]=="Installed" and not package.has_key('Install Reason'):
                         self.filteredPackages.append(package)
                     elif filter[1]=="Upgradable" and not package.has_key('Update'):
                         self.filteredPackages.append(package)

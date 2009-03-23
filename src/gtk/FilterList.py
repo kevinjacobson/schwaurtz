@@ -30,7 +30,6 @@
 import wx
 import sys
 sys.path.append("../")
-import manager
 import  wx.lib.mixins.listctrl  as  listmix
 
 class FilterList(wx.ListCtrl,listmix.ListCtrlAutoWidthMixin):

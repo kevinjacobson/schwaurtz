@@ -30,7 +30,6 @@
 import wx
 import sys
 sys.path.append("../")
-from manager import PacmanData
 
 class InfoTextView(wx.TextCtrl):
 
