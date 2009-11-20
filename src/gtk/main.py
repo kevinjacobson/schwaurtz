@@ -44,7 +44,7 @@ class Interface:
         else:
             description += "no description"
         description += "\n\n"
-        if package.has_key('Install Reason'):
+        if package.has_key('Status'):
             description += "Status: Installed\n"
         else:
             description += "Status: Not installed\n"
@@ -79,7 +79,7 @@ class Interface:
                 info = []
                 if package.has_key('Update'):
                     info.append("U")
-                elif package.has_key('Install Reason') or package['Repository']=='local':
+                elif package.has_key('Status'):
                     info.append("X")
                 else:
                     info.append("O")

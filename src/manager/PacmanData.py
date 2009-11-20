@@ -31,21 +31,32 @@
 
 import subprocess as sub
 
-def checkPackageStatus():
-    p = sub.Popen(["pacman","-Qi"],stdout=sub.PIPE).stdout
+def checkLocalList(packages):
+    p = sub.Popen(["pacman","-Q"],stdout=sub.PIPE).stdout
     output = []
-    package = {}
+    data = dict([ ((x['Name'],x['Version']), x) for x in packages ]) # decorate
     for line in p.readlines():
-        keyAndObject = line.split(" : ")
+        keyAndObject = line.split(" ")
         if len(keyAndObject)==2:
-            package[keyAndObject[0].strip()] = keyAndObject[1].strip()
-        elif line.strip()=="" and package.has_key('Name'):
-            if not package.has_key('Repository'):
-                package['Repository'] = "local"
-                package['Install Reason'] = "Unknown"
-            output.append(package)
-            package = {}
-
+            if (keyAndObject[0].strip(),keyAndObject[1].strip()) in data.keys():
+                data[(keyAndObject[0].strip(),keyAndObject[1].strip())]["Status"] = "Installed"
+                data[(keyAndObject[0].strip(),keyAndObject[1].strip())]["Installed Version"] = keyAndObject[0].strip()
+            else:
+                q = sub.Popen(["pacman","-Qi",keyAndObject[0].strip()],stdout=sub.PIPE).stdout
+                package = {}
+                for qline in q.readlines():
+                    kAndO = qline.split(" : ")
+                    if len(kAndO)==2:
+                        currentKey = kAndO[0].strip()
+                        package[currentKey] = kAndO[1].strip()
+                    elif qline.strip()=="" and package.has_key('Name'):
+                        package["Status"] = "Installed"
+                        package['Repository'] = "local"
+                        output.append(package)
+                    else:
+                        package[currentKey] += " "+kAndO[0].strip()
+    for x in data.keys():
+        output.append(data[x]) # undecorate
     return output
 
 def addRemotePackages():
@@ -71,6 +82,7 @@ def getPackageList():
     #for k in dict.keys():
     #    list.append(dict[k])
     packages = addRemotePackages()
+    packages = checkLocalList(packages)
     data = [ (x['Name'], x) for x in packages ] # decorate
     data.sort()
     packages = [ x[1] for x in data ] # undecorate
@@ -79,6 +91,9 @@ def getPackageList():
 def getValueSet(packageList,key):
     set = []
     for p in packageList:
-        if not p[key] in set:
-            set.append(p[key])
+        values = p[key].split(" ")
+        for value in values:
+            value = value.strip()
+            if (not value in set) and not value == "":
+                set.append(value)
     return set
